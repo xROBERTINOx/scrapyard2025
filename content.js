@@ -11,8 +11,88 @@
       } else if (window.location.pathname === '/watch') {
         initializeRandomVideoSwitcher();
         initializeRandomVideoMuter();
+        initializeTheaterModeFlipper();
       }
     }
+
+    function initializeTheaterModeFlipper() {
+        console.log("Theater mode flipper initialized");
+        
+        // Initial run
+        switchViewMode();
+        
+        // Set up interval to run exactly every minute
+        setInterval(switchViewMode, 60000); // 60000ms = 1 minute
+      }
+      
+      function switchViewMode() {
+        const theaterModeButton = document.querySelector('.ytp-size-button');
+        const fullscreenButton = document.querySelector('.ytp-fullscreen-button');
+        
+        console.log("Looking for control buttons...");
+        
+        if (theaterModeButton && fullscreenButton) {
+          console.log("Found buttons!");
+          
+          // Get current mode
+          const theaterModeLabel = theaterModeButton.getAttribute('aria-label');
+          const fullscreenLabel = fullscreenButton.getAttribute('aria-label');
+          
+          // Make sure the attributes exist before checking includes
+          const isTheaterMode = theaterModeLabel ? theaterModeLabel.includes('Default') : false;
+          const isFullscreen = fullscreenLabel ? fullscreenLabel.includes('Exit') : false;
+          
+          console.log("Current mode:", 
+                      isFullscreen ? "Fullscreen" : 
+                      isTheaterMode ? "Theater" : "Default");
+          
+          // Randomly choose a mode different from the current one
+          const randomChoice = Math.floor(Math.random() * 3); // 0, 1, or 2
+          
+          console.log("Switching to mode:", randomChoice);
+          
+          // Show indicator about mode change
+        //   alert("Switching video mode!");
+          
+          // Apply the chosen mode
+          if (randomChoice === 0) {
+            // Default view
+            console.log("Attempting to switch to Default view");
+            if (isFullscreen) {
+              fullscreenButton.click(); // Exit fullscreen first
+              setTimeout(() => {
+                if (isTheaterMode) theaterModeButton.click(); // Then exit theater mode
+              }, 300);
+            } else if (isTheaterMode) {
+              theaterModeButton.click(); // Exit theater mode
+            }
+          } else if (randomChoice === 1) {
+            // Theater mode
+            console.log("Attempting to switch to Theater mode");
+            if (isFullscreen) {
+              fullscreenButton.click(); // Exit fullscreen first
+              setTimeout(() => {
+                if (!isTheaterMode) theaterModeButton.click(); // Then enter theater mode
+              }, 300);
+            } else if (!isTheaterMode) {
+              theaterModeButton.click(); // Enter theater mode
+            }
+          } else if (randomChoice === 2) {
+            // Fullscreen mode
+            console.log("Attempting to switch to Fullscreen mode");
+            if (!isFullscreen) {
+              fullscreenButton.click();
+            }
+          }
+        } else {
+          console.error("Could not find YouTube player buttons");
+          console.log("Will try again on next interval");
+          // Removed the alert to prevent constant alerts if buttons aren't found
+        }
+      }
+      
+      
+      
     
     function initializeRandomVideoMuter() {
         // Set a random timeout between 60-120 seconds to mute the video
