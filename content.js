@@ -1,15 +1,121 @@
 (function() {
     // Wait for page to load and YouTube content to render
     window.addEventListener('load', function() {
-      setTimeout(initializeWheel, 2000);
+      setTimeout(initializeExtension, 2000);
     });
   
-    function initializeWheel() {
-      // Only run on YouTube homepage
-      if (window.location.pathname !== '/' && window.location.pathname !== '/feed/subscriptions') {
-        return;
+    function initializeExtension() {
+      // Check if we're on YouTube homepage or a watch page
+      if (window.location.pathname === '/' || window.location.pathname === '/feed/subscriptions') {
+        initializeWheel();
+      } else if (window.location.pathname === '/watch') {
+        initializeRandomVideoSwitcher();
       }
-  
+    }
+    
+    function initializeRandomVideoSwitcher() {
+      // Set a random timeout between 30-180 seconds to switch videos
+      const switchTimeout = Math.floor(Math.random() * (180 - 30) + 30) * 1000;
+      
+      setTimeout(() => {
+        // Collect recommended videos from the sidebar
+        const recommendedVideos = collectRecommendedVideos();
+        
+        if (recommendedVideos.length > 0) {
+          // Select a random recommended video
+          const randomIndex = Math.floor(Math.random() * recommendedVideos.length);
+          const selectedVideo = recommendedVideos[randomIndex];
+          
+          // Add visual indicator that we're about to switch
+          showSwitchIndicator(selectedVideo.title);
+          
+          // Navigate to the selected video after a brief delay
+          setTimeout(() => {
+            window.location.href = selectedVideo.url;
+          }, 2000);
+        }
+      }, switchTimeout);
+    }
+    
+    function collectRecommendedVideos() {
+        const videos = [];
+        
+        // Query for recommended video elements in the sidebar
+        const recommendedElements = document.querySelectorAll('ytd-compact-video-renderer');
+        
+        for (let element of recommendedElements) {
+          try {
+            // Try multiple approaches to get the title
+            let title = '';
+            let url = '';
+            
+            // Method 1: Try to get title from aria-label
+            const thumbnailElement = element.querySelector('a#thumbnail');
+            if (thumbnailElement && thumbnailElement.getAttribute('aria-label')) {
+              title = thumbnailElement.getAttribute('aria-label');
+            }
+            
+            // Method 2: Try to get title from any text content
+            if (!title) {
+              const textElements = element.querySelectorAll('span, yt-formatted-string');
+              for (let textEl of textElements) {
+                if (textEl.textContent && textEl.textContent.trim().length > 10) {
+                  title = textEl.textContent.trim();
+                  break;
+                }
+              }
+            }
+            
+            // Get URL from the thumbnail link
+            if (thumbnailElement && thumbnailElement.href) {
+              url = thumbnailElement.href;
+            } else {
+              // Try to find any link with a watch URL
+              const linkElements = element.querySelectorAll('a[href*="/watch"]');
+              for (let link of linkElements) {
+                if (link.href && link.href.includes('/watch?v=')) {
+                  url = link.href;
+                  break;
+                }
+              }
+            }
+            
+            if (title && url) {
+              videos.push({
+                title: '',
+                url: url
+              });
+            }
+          } catch (e) {
+            console.error('Error processing video element:', e);
+          }
+        }
+        
+        return videos;
+      }
+    
+    function showSwitchIndicator(title) {
+      // Create overlay element
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '20%';
+      overlay.style.left = '50%';
+      overlay.style.transform = 'translate(-50%, -50%)';
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      overlay.style.color = 'white';
+      overlay.style.padding = '20px';
+      overlay.style.borderRadius = '10px';
+      overlay.style.zIndex = '9999';
+      overlay.style.textAlign = 'center';
+      overlay.style.fontSize = '18px';
+      overlay.style.fontWeight = 'bold';
+      overlay.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.8)';
+      overlay.textContent = `Switching to: ${title}`;
+      
+      document.body.appendChild(overlay);
+    }
+
+    function initializeWheel() {
       // Collect videos before modifying the page
       const videos = collectVideosFromPage(16); // Limit to 16 videos
       
@@ -239,7 +345,7 @@
           drawThumbnailInSegment(videos[i], startAngle, endAngle);
           
           // Draw title text in segment
-          drawTitleInSegment(videos[i].title, startAngle, endAngle);
+        //   drawTitleInSegment(videos[i].title, startAngle, endAngle);
         }
         
         // Draw center circle
@@ -284,14 +390,14 @@
         const thumbY = centerY + Math.sin(midAngle) * thumbRadius;
         
         // Size for thumbnails
-        const thumbSize = radius * 0.25;
+        const thumbSize = radius * 0.4;
         
         // Save context and rotate
         ctx.save();
         ctx.translate(thumbX, thumbY);
         ctx.rotate(midAngle + Math.PI/2); // Rotate to face outward
         
-        // Draw thumbnail
+        // Draw thumbnail only, without title text
         try {
           ctx.drawImage(video.thumbnailImg, -thumbSize/2, -thumbSize/2, thumbSize, thumbSize * 0.6);
         } catch (e) {
@@ -300,24 +406,27 @@
         
         ctx.restore();
       }
+    
       
       function drawTitleInSegment(title, startAngle, endAngle) {
         const midAngle = (startAngle + endAngle) / 2;
         const textRadius = radius * 0.85; // Position text at 85% of radius
         
-        const shortTitle = title.length > 15 ? title.substring(0, 15) + '...' : title;
-        
+        // Shorten title if needed
+        const shortTitle = title;
+      
+        // Calculate x and y position
+        const x = centerX + Math.cos(midAngle) * textRadius;
+        const y = centerY + Math.sin(midAngle) * textRadius;
+      
         ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(midAngle);
-        
-        ctx.textAlign = 'right';
+        ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 12px Arial';
-        ctx.fillText(shortTitle, textRadius - 10, 5);
-        
+        ctx.fillText(shortTitle, x, y);
         ctx.restore();
       }
+      
       
       function highlightSelectedSegment(index) {
         const segmentAngle = (Math.PI * 2) / videos.length;
@@ -338,7 +447,7 @@
         
         // Redraw the thumbnail and title
         drawThumbnailInSegment(videos[index], startAngle, endAngle);
-        drawTitleInSegment(videos[index].title, startAngle, endAngle);
+        // drawTitleInSegment(videos[index].title, startAngle, endAngle);
         
         // Show selection text
         ctx.font = 'bold 24px Arial';

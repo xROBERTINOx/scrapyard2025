@@ -3,53 +3,89 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background-color: #0f0f0f;
+    padding: 2rem;
+    background-color: #121212;
     min-height: 85vh;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
   }
   
   #yt-giant-wheel-canvas {
     max-width: 90vw;
     max-height: 70vh;
-    margin-bottom: 20px;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    margin-bottom: 2.5rem;
+    box-shadow: 0 0 30px rgba(0, 0, 255, 0.4), 0 0 60px rgba(0, 0, 0, 0.3);
     border-radius: 50%;
+    transition: transform 0.3s ease-out;
+    background-color: green; /* Changed this line */
+  }
+  
+  #yt-giant-wheel-canvas:hover {
+    transform: scale(1.02);
   }
   
   #yt-giant-wheel-spin {
-    padding: 15px 40px;
-    font-size: 24px;
-    font-weight: bold;
-    background-color: #cc0000;
+    padding: 0.9rem 2.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background-color: #ff0000;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-bottom: 15px;
-    transition: background-color 0.3s, transform 0.2s;
+    margin-bottom: 1.25rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
   
   #yt-giant-wheel-spin:hover {
-    background-color: #ff0000;
-    transform: scale(1.05);
+    background-color: #e50000;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(255, 0, 0, 0.4);
+  }
+  
+  #yt-giant-wheel-spin:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
   }
   
   #yt-giant-wheel-spin:disabled {
-    background-color: #666;
+    background-color: #555;
+    color: #aaa;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
   }
   
   #yt-giant-wheel-reset {
-    padding: 8px 16px;
-    font-size: 16px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    background-color: transparent;
+    color: #cccccc;
+    border: 2px solid #444;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   
   #yt-giant-wheel-reset:hover {
-    background-color: #555;
+    background-color: #333;
+    color: white;
+    border-color: #666;
+  }
+  
+  @media (max-width: 768px) {
+    #yt-giant-wheel-canvas {
+      max-height: 60vh;
+      margin-bottom: 2rem;
+    }
+    
+    #yt-giant-wheel-spin {
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+    }
   }
