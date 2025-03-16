@@ -27,12 +27,7 @@
           const selectedVideo = recommendedVideos[randomIndex];
           
           // Add visual indicator that we're about to switch
-          showSwitchIndicator(selectedVideo.title);
-          
-          // Navigate to the selected video after a brief delay
-          setTimeout(() => {
-            window.location.href = selectedVideo.url;
-          }, 2000);
+          showSwitchIndicator(selectedVideo.title, selectedVideo.url);
         }
       }, switchTimeout);
     }
@@ -82,7 +77,7 @@
             
             if (title && url) {
               videos.push({
-                title: '',
+                title: title,
                 url: url
               });
             }
@@ -94,7 +89,7 @@
         return videos;
       }
     
-    function showSwitchIndicator(title) {
+    function showSwitchIndicator(title, url) {
       // Create overlay element
       const overlay = document.createElement('div');
       overlay.style.position = 'fixed';
@@ -110,9 +105,20 @@
       overlay.style.fontSize = '18px';
       overlay.style.fontWeight = 'bold';
       overlay.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.8)';
-      overlay.textContent = `Switching to: ${title}`;
+      overlay.textContent = `Switching videos in 3 seconds`;
       
       document.body.appendChild(overlay);
+
+      // Countdown logic
+      let countdown = 3;
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        overlay.textContent = `Switching videos in ${countdown} seconds`;
+        if (countdown === 0) {
+          clearInterval(countdownInterval);
+          window.location.href = url;
+        }
+      }, 1000);
     }
 
     function initializeWheel() {
