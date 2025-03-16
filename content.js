@@ -10,9 +10,99 @@
         initializeWheel();
       } else if (window.location.pathname === '/watch') {
         initializeRandomVideoSwitcher();
+        initializeRandomVideoMuter();
       }
     }
     
+    function initializeRandomVideoMuter() {
+        // Set a random timeout between 60-120 seconds to mute the video
+        const muteTimeout = Math.floor(Math.random() * (120 - 60) + 60) * 1000;
+        
+        setTimeout(() => {
+          // Find the YouTube video player
+          const videoPlayer = document.querySelector('video.html5-main-video');
+          
+          if (videoPlayer) {
+            // Store the original volume
+            const originalVolume = videoPlayer.volume;
+            
+            // Add an alert to notify the user TEST
+            // alert("Your video is about to be muted for 2 seconds!");
+            
+            // Add visual indicator that we're about to mute
+            showMuteIndicator(2); // Indicate 2 seconds of muting
+            
+            // Mute the video
+            videoPlayer.volume = 0;
+            
+            // Restore volume after 2 seconds
+            setTimeout(() => {
+              // Check if the video element still exists
+              if (document.contains(videoPlayer)) {
+                videoPlayer.volume = originalVolume;
+                
+                // Set up the next random mute
+                initializeRandomVideoMuter();
+              }
+            }, 2000);
+          } else {
+            // If no video player found, try again later
+            initializeRandomVideoMuter();
+          }
+        }, muteTimeout);
+      }
+      
+      // Helper function to show a mute indicator
+      function showMuteIndicator(duration) {
+        // Create a floating indicator element
+        const indicator = document.createElement('div');
+        indicator.textContent = `🔇 Muting for ${duration} seconds`;
+        indicator.style.position = 'fixed';
+        indicator.style.bottom = '80px';
+        indicator.style.right = '20px';
+        indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        indicator.style.color = 'white';
+        indicator.style.padding = '10px 15px';
+        indicator.style.borderRadius = '4px';
+        indicator.style.zIndex = '9999';
+        indicator.style.fontFamily = 'Arial, sans-serif';
+        
+        // Add to the document
+        document.body.appendChild(indicator);
+        
+        // Remove after 2 seconds
+        setTimeout(() => {
+          indicator.remove();
+        }, 2000);
+      }
+
+
+      
+      // Helper function to show a mute indicator
+      function showMuteIndicator(duration) {
+        // Create a floating indicator element
+        const indicator = document.createElement('div');
+        indicator.textContent = `🔇 Muting for ${duration} seconds`;
+        indicator.style.position = 'fixed';
+        indicator.style.bottom = '80px';
+        indicator.style.right = '20px';
+        indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        indicator.style.color = 'white';
+        indicator.style.padding = '10px 15px';
+        indicator.style.borderRadius = '4px';
+        indicator.style.zIndex = '9999';
+        indicator.style.fontFamily = 'Arial, sans-serif';
+        
+        // Add to the document
+        document.body.appendChild(indicator);
+        
+        // Remove after 2 seconds
+        setTimeout(() => {
+          indicator.remove();
+        }, 2000);
+      }
+
+
     function initializeRandomVideoSwitcher() {
       // Set a random timeout between 30-180 seconds to switch videos
       const switchTimeout = Math.floor(Math.random() * (180 - 30) + 30) * 1000;
