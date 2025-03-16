@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "YouTube Random Video Wheel",
+    "name": "YouTube Giant Wheel",
     "version": "1.0",
-    "description": "Adds a wheel spinner to YouTube to select random videos",
+    "description": "Transforms YouTube homepage into a giant spinning wheel of videos",
     "permissions": ["activeTab", "scripting"],
     "host_permissions": ["*://*.youtube.com/*"],
     "content_scripts": [
@@ -13,4 +13,3 @@
       }
     ]
   }
-  
